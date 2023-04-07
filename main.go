@@ -37,9 +37,11 @@ func init() {
 	router.Use(cors.New(corsConfig))
 	router.Use(middleware.Recover)
 
-	router.POST("/user/login", handler.Login)
-
-	router.POST("/user/logout", handler.Logout)
+	user := router.Group("/user")
+	{
+		user.POST("/login", handler.Login)
+		user.POST("/logout", handler.Logout)
+	}
 
 	resource := router.Group("/api")
 	{

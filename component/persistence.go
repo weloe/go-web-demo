@@ -38,6 +38,7 @@ func connectDB() {
 	dbUrl := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", username, password, host, port, Dbname, timeout)
 	log.Println(dbUrl)
 	DB, err = gorm.Open("mysql", dbUrl)
+	DB.SingularTable(true)
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("failed to connect to DB: %v", err))
 	}
