@@ -16,9 +16,9 @@ func Login(c *gin.Context) {
 		c.JSON(400, component.RestResponse{Code: -1, Message: " bind error"})
 		return
 	}
-	username, token := service.Login(loginRequest)
+	token := service.Login(loginRequest)
 
-	c.JSON(200, component.RestResponse{Code: 1, Data: token, Message: username + " logged in successfully"})
+	c.JSON(200, component.RestResponse{Code: 1, Data: token, Message: loginRequest.Username + " logged in successfully"})
 
 }
 

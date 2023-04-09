@@ -8,7 +8,7 @@ import (
 	"go-web-demo/handler/request"
 )
 
-func Login(loginRequest *request.Login) (string, string) {
+func Login(loginRequest *request.Login) string {
 	password := loginRequest.Password
 	username := loginRequest.Username
 
@@ -23,7 +23,7 @@ func Login(loginRequest *request.Login) (string, string) {
 	if err != nil {
 		panic(fmt.Errorf("failed to generate UUID: %w", err))
 	}
-	// sprintf token
+	// Sprintf token
 	token := fmt.Sprintf("%s-%s", u.String(), "token")
 	// Store current subject in cache
 	err = component.GlobalCache.Set(token, []byte(username))
@@ -32,5 +32,5 @@ func Login(loginRequest *request.Login) (string, string) {
 	}
 	// Send cache key back to client cookie
 	//c.SetCookie("current_subject", token, 30*60, "/resource", "", false, true)
-	return username, token
+	return token
 }
