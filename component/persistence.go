@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/allegro/bigcache"
 	"github.com/casbin/casbin/v2"
-	gormadapter "github.com/casbin/gorm-adapter/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
 	"go-web-demo/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 	"time"
 )
@@ -42,8 +43,8 @@ func ConnectDB() {
 
 	dbUrl := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", username, password, host, port, Dbname, timeout)
 	log.Println("connect db url: " + dbUrl)
-	DB, err = gorm.Open("mysql", dbUrl)
-	DB.SingularTable(true)
+	DB, err = gorm.Open(mysql.Open(dbUrl), &gorm.Config{})
+
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("failed to connect to DB: %v", err))
 	}
@@ -72,7 +73,7 @@ func CreateCasbinEnforcer() {
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("failed to create casbin enforcer: %v", err))
 	}
-	
+
 	//// Load policies from DB dynamically
 	//err = Enforcer.LoadPolicy()
 	//if err != nil {
