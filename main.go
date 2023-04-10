@@ -37,6 +37,7 @@ func init() {
 	{
 		user.POST("/login", handler.Login)
 		user.POST("/logout", handler.Logout)
+		user.POST("/register", handler.Register)
 	}
 
 	resource := router.Group("/api")
@@ -49,7 +50,6 @@ func init() {
 
 func main() {
 	// Start
-	defer component.DB.Close()
 	port := "8081"
 	err := router.Run(":" + port)
 	if err != nil {

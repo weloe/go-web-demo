@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"github.com/casbin/casbin/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/google/uuid"
 	"go-web-demo/component"
 	"go-web-demo/dao"
@@ -34,3 +36,36 @@ func Login(loginRequest *request.Login) string {
 	//c.SetCookie("current_subject", token, 30*60, "/resource", "", false, true)
 	return token
 }
+
+func Register(register *request.Register) {
+	var err error
+	e := component.Enforcer
+	err = e.GetAdapter().(*gormadapter.Adapter).Transaction(e, func(copyEnforcer casbin.IEnforcer) error {
+		// Insert to table
+		db := copyEnforcer.GetAdapter().(*gormadapter.Adapter).GetDb()
+		res := db.Exec("insert into user (username,password) values(?,?)", register.Username, register.Password)
+
+		//User has Username and Password
+		//res := db.Table("user").Create(&User{
+		//	Username: register.Username,
+		//	Password: register.Password,
+		//})
+
+		if err != nil || res.RowsAffected < 1 {
+			return fmt.Errorf("insert error: %w", err)
+		}
+
+		_, err = copyEnforcer.AddPolicy(register.Username, "resource", "write")
+		if err != nil {
+			return fmt.Errorf("add plocy error: %w", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+}
+

@@ -46,3 +46,16 @@ func Logout(c *gin.Context) {
 
 	c.JSON(200, component.RestResponse{Code: 1, Data: token, Message: username + " logout in successfully"})
 }
+
+func Register(c *gin.Context) {
+	register := &request.Register{}
+	err := c.ShouldBindBodyWith(register, binding.JSON)
+	if err != nil {
+		c.JSON(400, component.RestResponse{Code: -1, Message: " bind error"})
+		return
+	}
+
+	service.Register(register)
+
+	c.JSON(200, component.RestResponse{Code: 1, Data: nil, Message: "register successfully"})
+}
