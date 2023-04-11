@@ -7,18 +7,18 @@ import (
 	"go-web-demo/component"
 	"go-web-demo/handler/request"
 	"go-web-demo/service"
+	"net/http"
 )
 
 func Login(c *gin.Context) {
 	loginRequest := &request.Login{}
 	err := c.ShouldBindBodyWith(loginRequest, binding.JSON)
 	if err != nil {
-		c.JSON(400, component.RestResponse{Code: -1, Message: " bind error"})
-		return
+		panic(fmt.Errorf("request body bind error: %v", err))
 	}
 	token := service.Login(loginRequest)
 
-	c.JSON(200, component.RestResponse{Code: 1, Data: token, Message: loginRequest.Username + " logged in successfully"})
+	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Data: token, Message: loginRequest.Username + " logged in successfully"})
 
 }
 
@@ -32,7 +32,7 @@ func Logout(c *gin.Context) {
 	bytes, err := component.GlobalCache.Get(token)
 
 	if err != nil {
-		panic(fmt.Errorf("token error: failed to get username : %v", err))
+		panic(fmt.Errorf("token error: failed to get username: %v", err))
 	}
 
 	username := string(bytes)
@@ -44,7 +44,7 @@ func Logout(c *gin.Context) {
 		panic(fmt.Errorf("failed to delete current subject in cache: %w", err))
 	}
 
-	c.JSON(200, component.RestResponse{Code: 1, Data: token, Message: username + " logout in successfully"})
+	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Data: token, Message: username + " logout in successfully"})
 }
 
 func Register(c *gin.Context) {
@@ -57,5 +57,5 @@ func Register(c *gin.Context) {
 
 	service.Register(register)
 
-	c.JSON(200, component.RestResponse{Code: 1, Data: nil, Message: "register successfully"})
+	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Data: nil, Message: "register successfully"})
 }

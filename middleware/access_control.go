@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"go-web-demo/component"
 	"log"
+	"net/http"
 )
 
 // DefaultAuthorize determines if current subject has been authorized to take an action on an object.
@@ -17,13 +18,13 @@ func DefaultAuthorize(obj string, act string) gin.HandlerFunc {
 		// Get current user/subject
 		token := c.Request.Header.Get("token")
 		if token == "" {
-			c.AbortWithStatusJSON(401, component.RestResponse{Message: "token is nil"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, component.RestResponse{Message: "token is nil"})
 			return
 		}
 		username, err := component.GlobalCache.Get(token)
 		if err != nil || string(username) == "" {
 			log.Println(err)
-			c.AbortWithStatusJSON(401, component.RestResponse{Message: "user hasn't logged in yet"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, component.RestResponse{Message: "user hasn't logged in yet"})
 			return
 		}
 
@@ -31,11 +32,11 @@ func DefaultAuthorize(obj string, act string) gin.HandlerFunc {
 		ok, err := enforce(string(username), obj, act, component.Enforcer)
 		if err != nil {
 			log.Println(err)
-			c.AbortWithStatusJSON(500, component.RestResponse{Message: "error occurred when authorizing user"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, component.RestResponse{Message: "error occurred when authorizing user"})
 			return
 		}
 		if !ok {
-			c.AbortWithStatusJSON(403, component.RestResponse{Message: "forbidden"})
+			c.AbortWithStatusJSON(http.StatusForbidden, component.RestResponse{Message: "forbidden"})
 			return
 		}
 
