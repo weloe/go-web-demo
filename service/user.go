@@ -55,7 +55,7 @@ func Register(register *request.Register) {
 			return fmt.Errorf("insert error: %w", err)
 		}
 
-		_, err = copyEnforcer.AddPolicy(register.Username, "resource", "write")
+		_, err = copyEnforcer.AddRoleForUser(register.Username, "role::user")
 		if err != nil {
 			return fmt.Errorf("add plocy error: %w", err)
 		}
