@@ -33,6 +33,9 @@ func ConnectDB() {
 	// connect to DB
 	var err error
 	dbConfig := config.Reader.ReadConfig().Mysql
+	if dbConfig == nil {
+		log.Fatalf(fmt.Sprintf("db config is nil"))
+	}
 	// config
 	username := dbConfig.Username
 	password := dbConfig.Password
@@ -53,6 +56,9 @@ func ConnectDB() {
 func CreateLocalCache() {
 	var err error
 	cacheConfig := config.Reader.ReadConfig().LocalCache
+	if cacheConfig == nil {
+		log.Fatalf(fmt.Sprintf("cache config is nil"))
+	}
 	// Initialize cache to store current user in cache.
 	GlobalCache, err = bigcache.NewBigCache(bigcache.DefaultConfig(cacheConfig.ExpireTime * time.Second)) // Set expire time to 30 s
 	if err != nil {
@@ -64,7 +70,11 @@ func CreateCasbinEnforcer() {
 	var err error
 
 	// casbin model
-	model := config.Reader.ReadConfig().Casbin.Model
+	config := config.Reader.ReadConfig().Casbin
+	if config == nil {
+		log.Fatalf(fmt.Sprintf("casbin config is nil"))
+	}
+	model := config.Model
 	//Initialize casbin adapter
 	adapter, _ := gormadapter.NewAdapterByDB(DB)
 
