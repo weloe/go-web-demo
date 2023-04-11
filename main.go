@@ -5,7 +5,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-web-demo/component"
-	"go-web-demo/config"
 	"go-web-demo/handler"
 	"go-web-demo/middleware"
 	"log"
@@ -16,10 +15,7 @@ var (
 )
 
 func init() {
-	// Initialize confif yaml
-	config.Reader.ReadConfig()
-
-	//Initialize components: mysql locaCache casbin
+	//Initialize components from config yaml: mysql locaCache casbin
 	component.CreateByConfig()
 
 	// Initialize gin engine
