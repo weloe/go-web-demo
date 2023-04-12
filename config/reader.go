@@ -16,7 +16,7 @@ type Config struct {
 }
 
 type Server struct {
-	Port int64
+	Port string
 }
 
 type DB struct {

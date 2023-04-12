@@ -5,6 +5,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-web-demo/component"
+	"go-web-demo/config"
 	"go-web-demo/handler"
 	"go-web-demo/middleware"
 	"log"
@@ -47,7 +48,7 @@ func init() {
 
 func main() {
 	// Start
-	port := "8081"
+	port := config.Reader.Server.Port
 	err := router.Run(":" + port)
 	if err != nil {
 		panic(fmt.Sprintf("failed to start gin engine: %v", err))
