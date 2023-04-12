@@ -38,8 +38,9 @@ func init() {
 
 	resource := router.Group("/api")
 	{
-		resource.GET("/resource", middleware.DefaultAuthorize("resource", "read"), handler.ReadResource)
-		resource.POST("/resource", middleware.DefaultAuthorize("resource", "write"), handler.WriteResource)
+		resource.Use(middleware.DefaultAuthorize("resource", "read-write"))
+		resource.GET("/resource", handler.ReadResource)
+		resource.POST("/resource", handler.WriteResource)
 	}
 
 }
