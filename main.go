@@ -38,7 +38,7 @@ func init() {
 
 	resource := router.Group("/api")
 	{
-		resource.Use(middleware.DefaultAuthorize("resource", "read-write"))
+		resource.Use(middleware.DefaultAuthorize("user::resource", "read-write"))
 		resource.GET("/resource", handler.ReadResource)
 		resource.POST("/resource", handler.WriteResource)
 	}
