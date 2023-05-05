@@ -83,6 +83,8 @@ func CreateCasbinEnforcer() {
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("failed to create casbin enforcer: %v", err))
 	}
+	Enforcer.EnableEnforce(config.EnableEnforcer)
+	Enforcer.EnableLog(config.EnableLog)
 
 	//// Load policies from DB dynamically
 	//err = Enforcer.LoadPolicy()

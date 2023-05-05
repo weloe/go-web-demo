@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 mysql:
   username: root
@@ -14,3 +14,5 @@ localCache:
 
 casbin:
   model: config/rbac_model.conf
+  enableEnforcer: true
+  enableLog: true

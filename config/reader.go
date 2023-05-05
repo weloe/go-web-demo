@@ -33,7 +33,9 @@ type LocalCache struct {
 }
 
 type Casbin struct {
-	Model string
+	Model          string
+	EnableEnforcer bool
+	EnableLog      bool
 }
 
 var (
