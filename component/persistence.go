@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	_ "github.com/go-sql-driver/mysql"
+	tokenGo "github.com/weloe/token-go"
 	"go-web-demo/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,9 +15,10 @@ import (
 )
 
 var (
-	DB          *gorm.DB
-	GlobalCache *bigcache.BigCache
-	Enforcer    *casbin.Enforcer
+	DB            *gorm.DB
+	GlobalCache   *bigcache.BigCache
+	Enforcer      *casbin.Enforcer
+	TokenEnforcer *tokenGo.Enforcer
 )
 
 // CreateByConfig create components
@@ -27,6 +29,8 @@ func CreateByConfig() {
 	CreateLocalCache()
 
 	CreateCasbinEnforcer()
+
+	CreateTokenEnforcer()
 }
 
 func ConnectDB() {
@@ -91,4 +95,14 @@ func CreateCasbinEnforcer() {
 	//if err != nil {
 	//	log.Fatalf(fmt.Sprintf("failed to load policy from DB: %v", err))
 	//}
+}
+
+func CreateTokenEnforcer() {
+	adapter := tokenGo.NewDefaultAdapter()
+
+	var err error
+	TokenEnforcer, err = tokenGo.NewEnforcer(adapter)
+	if err != nil {
+		log.Fatalf("NewDefaultEnforcer() failed: %v", err)
+	}
 }

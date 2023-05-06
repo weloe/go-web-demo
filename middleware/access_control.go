@@ -6,6 +6,7 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	tokenGo "github.com/weloe/token-go"
 	"go-web-demo/component"
 	"log"
 	"net/http"
@@ -16,20 +17,14 @@ func DefaultAuthorize(obj string, act string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// Get current user/subject
-		token := c.Request.Header.Get("token")
-		if token == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, component.RestResponse{Message: "token is nil"})
-			return
-		}
-		username, err := component.GlobalCache.Get(token)
-		if err != nil || string(username) == "" {
-			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusUnauthorized, component.RestResponse{Message: "user hasn't logged in yet"})
+		username, err := component.TokenEnforcer.GetLoginId(tokenGo.NewHttpContext(c.Request, c.Writer))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, component.RestResponse{Message: fmt.Sprintf("%v", err)})
 			return
 		}
 
 		// Casbin enforces policy
-		ok, err := enforce(string(username), obj, act, component.Enforcer)
+		ok, err := enforce(username, obj, act, component.Enforcer)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, component.RestResponse{Message: "error occurred when authorizing user"})

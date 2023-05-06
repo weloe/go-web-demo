@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/google/uuid"
+	"github.com/gin-gonic/gin"
+	tokenGo "github.com/weloe/token-go"
 	"go-web-demo/component"
 	"go-web-demo/dao"
 	"go-web-demo/handler/request"
 )
 
-func Login(loginRequest *request.Login) string {
+func Login(loginRequest *request.Login, c *gin.Context) string {
 	password := loginRequest.Password
 	username := loginRequest.Username
 
@@ -20,17 +21,9 @@ func Login(loginRequest *request.Login) string {
 		panic(fmt.Errorf(username + " logged error : password error"))
 	}
 
-	// Generate random uuid token
-	u, err := uuid.NewRandom()
+	token, err := component.TokenEnforcer.Login(username, tokenGo.NewHttpContext(c.Request, c.Writer))
 	if err != nil {
-		panic(fmt.Errorf("failed to generate UUID: %w", err))
-	}
-	// Sprintf token
-	token := fmt.Sprintf("%s-%s", u.String(), "token")
-	// Store current subject in cache
-	err = component.GlobalCache.Set(token, []byte(username))
-	if err != nil {
-		panic(fmt.Errorf("failed to store current subject in cache: %w", err))
+		panic(fmt.Errorf("failed to login: %w", err))
 	}
 	// Send cache key back to client cookie
 	//c.SetCookie("current_subject", token, 30*60, "/resource", "", false, true)
@@ -59,7 +52,6 @@ func Register(register *request.Register) {
 		if err != nil {
 			return fmt.Errorf("add plocy error: %w", err)
 		}
-
 		return nil
 	})
 

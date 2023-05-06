@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	tokenGo "github.com/weloe/token-go"
 	"go-web-demo/component"
 	"go-web-demo/handler/request"
 	"go-web-demo/service"
@@ -16,35 +17,22 @@ func Login(c *gin.Context) {
 	if err != nil {
 		panic(fmt.Errorf("request body bind error: %v", err))
 	}
-	token := service.Login(loginRequest)
+
+	token := service.Login(loginRequest, c)
 
 	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Data: token, Message: loginRequest.Username + " logged in successfully"})
 
 }
 
 func Logout(c *gin.Context) {
-	token := c.Request.Header.Get("token")
-
-	if token == "" {
-		panic(fmt.Errorf("token error: token is nil"))
-	}
-
-	bytes, err := component.GlobalCache.Get(token)
+	// logout
+	err := component.TokenEnforcer.Logout(tokenGo.NewHttpContext(c.Request, c.Writer))
 
 	if err != nil {
-		panic(fmt.Errorf("token error: failed to get username: %v", err))
+		panic(fmt.Errorf("failed to Logout: %v", err))
 	}
 
-	username := string(bytes)
-	// Authentication
-
-	// Delete store current subject in cache
-	err = component.GlobalCache.Delete(token)
-	if err != nil {
-		panic(fmt.Errorf("failed to delete current subject in cache: %w", err))
-	}
-
-	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Data: token, Message: username + " logout in successfully"})
+	c.JSON(http.StatusOK, component.RestResponse{Code: 1, Message: " logout in successfully"})
 }
 
 func Register(c *gin.Context) {

@@ -37,6 +37,16 @@ func init() {
 		user.POST("/register", handler.Register)
 	}
 
+	test := router.Group("/test")
+	{
+		test.POST("/t1", func(context *gin.Context) {
+
+		})
+		test.POST("/t2", func(context *gin.Context) {
+
+		})
+	}
+
 	resource := router.Group("/api")
 	{
 		resource.Use(middleware.DefaultAuthorize("user::resource", "read-write"))
