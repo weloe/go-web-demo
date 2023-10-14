@@ -7,6 +7,7 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	_ "github.com/go-sql-driver/mysql"
 	tokenGo "github.com/weloe/token-go"
+	_ "github.com/weloe/token-go-extensions/redis-adapter"
 	"go-web-demo/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -98,9 +99,12 @@ func CreateCasbinEnforcer() {
 }
 
 func CreateTokenEnforcer() {
-	adapter := tokenGo.NewDefaultAdapter()
-
 	var err error
+	// adapter, err := redisAdapter.NewAdapter("ip:host", "username", "pwd", 0)
+	adapter := tokenGo.NewDefaultAdapter()
+	if err != nil {
+		log.Fatalf("NewRedisAdapter() failed: %v", err)
+	}
 	TokenEnforcer, err = tokenGo.NewEnforcer(adapter)
 	if err != nil {
 		log.Fatalf("NewDefaultEnforcer() failed: %v", err)
